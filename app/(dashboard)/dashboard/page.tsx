@@ -13,6 +13,9 @@ import {
   Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
+import { getAllLeaguesAction } from '@/actions';
+import { getAllCategoriesAction } from '@/actions/category-actions';
+import { getCurrentUserIdAction } from '@/actions/auth-actions';
 
 export default function DashboardPage() {
   const [leagues, setLeagues] = useState<LeagueResponse[]>([]);
@@ -26,8 +29,14 @@ export default function DashboardPage() {
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const data = await leagueService.getAll();
-      setLeagues(data);
+      const [leaguesResult] = await Promise.all([
+        getAllLeaguesAction()
+      ]);
+      if (leaguesResult.success) {
+        setLeagues(leaguesResult.data);
+      } else {
+        setError(leaguesResult.error || 'Erro ao carregar ligas');
+      }
       setError(null);
     } catch (err) {
       setError('Erro ao carregar dados do dashboard');

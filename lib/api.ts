@@ -152,6 +152,9 @@ export const leagueService = {
 };
 
 export const teamService = {
+  getAll: async () => {
+    return api.get<import('@/types').TeamResponse[]>('/teams');
+  },
   create: async (data: import('@/types').TeamRequest) => {
     return api.post<unknown>('/teams', data);
   },

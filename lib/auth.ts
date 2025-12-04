@@ -1,7 +1,6 @@
-// Funções de autenticação
+// Funções de autenticação (client-side)
 
-import { authService } from './api';
-import type { AuthUserResponse, User } from '@/types';
+import { loginAction, logoutAction } from '@/actions/auth-actions';
 
 export interface Session {
   userId: string;
@@ -10,64 +9,33 @@ export interface Session {
   expiresAt: number;
 }
 
-export async function signIn(email: string, password: string): Promise<Session> {
-  const response: AuthUserResponse = await authService.signIn(email, password);
+/**
+ * Realiza o login do usuário
+ * O token é salvo automaticamente nos cookies pela Server Action
+ */
+export async function signIn(email: string, password: string): Promise<void> {
+  const result = await loginAction(email, password);
   
-  // Calcula quando o token expira (expires_in está em segundos)
-  const expiresAt = Date.now() + response.expires_in * 1000;
-  
-  const session: Session = {
-    userId: '', // Você pode decodificar o JWT para obter o userId
-    email,
-    token: response.access_token,
-    expiresAt,
-  };
-
-  // Salva no localStorage
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('auth-token', response.access_token);
-    localStorage.setItem('session', JSON.stringify(session));
-  }
-
-  return session;
-}
-
-export function signOut(): void {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('auth-token');
-    localStorage.removeItem('session');
+  if (!result.success) {
+    throw new Error(result.error || 'Erro ao fazer login');
   }
 }
 
-export function getSession(): Session | null {
-  if (typeof window === 'undefined') return null;
-  
-  const token = localStorage.getItem('auth-token');
-  const sessionStr = localStorage.getItem('session');
-  
-  if (!token || !sessionStr) return null;
-
-  try {
-    const session: Session = JSON.parse(sessionStr);
-    
-    // Verifica se o token expirou
-    if (session.expiresAt < Date.now()) {
-      signOut();
-      return null;
-    }
-
-    return session;
-  } catch {
-    return null;
-  }
+/**
+ * Realiza o logout do usuário
+ * O token é removido automaticamente dos cookies pela Server Action
+ */
+export async function signOut(): Promise<void> {
+  await logoutAction();
 }
 
-export async function isAuthenticated(): Promise<boolean> {
-  const session = getSession();
-  return session !== null;
-}
-
+/**
+ * Verifica se o usuário está autenticado (client-side)
+ * Nota: A verificação real é feita no middleware usando cookies httpOnly
+ * Esta função retorna null pois o token não pode ser acessado via JavaScript por segurança
+ */
 export function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('auth-token');
+  // O token está em um cookie httpOnly, então não pode ser acessado via JavaScript
+  // A verificação de autenticação é feita no middleware
+  return null;
 }

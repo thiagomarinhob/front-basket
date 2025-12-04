@@ -118,6 +118,18 @@ export interface Player {
   updatedAt: string;
 }
 
+export interface PlayerResponse {
+  id: string;
+  firstName: string;
+  lastName: string;
+  document: string;
+  nickName?: string;
+  birthDate: string;
+  height?: number;
+  jerseyNumber?: number;
+  photoURL?: string;
+}
+
 export interface ListPlayersResponse {
   id: string;
   firstName: string;
@@ -338,6 +350,30 @@ export interface PageThreePointLeaderResponse {
   totalElements: number;
   size: number;
   content: ThreePointLeaderResponse[];
+  number: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+  empty: boolean;
+}
+
+export interface PagePlayerResponse {
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  content: PlayerResponse[];
+  number: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+  empty: boolean;
+}
+
+export interface PageTeamResponse {
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  content: TeamResponse[];
   number: number;
   first: boolean;
   last: boolean;

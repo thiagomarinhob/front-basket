@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { signIn } from '@/lib/auth';
+import { loginAction } from '@/actions/auth-actions';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,7 +19,12 @@ export default function LoginPage() {
     setError('');
 
     try {
-      await signIn(email, password);
+      const result = await loginAction(email, password);
+      
+      if (!result.success) {
+        setError(result.error || 'Credenciais inválidas. Tente novamente.');
+        return;
+      }
       
       const redirect = searchParams.get('redirect') || '/dashboard';
       router.push(redirect);
@@ -28,7 +33,7 @@ export default function LoginPage() {
       setError(
         err instanceof Error
           ? err.message
-          : 'Credenciais inválidas. Tente novamente.'
+          : 'Erro ao fazer login. Tente novamente.'
       );
     } finally {
       setIsLoading(false);

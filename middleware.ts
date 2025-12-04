@@ -17,10 +17,8 @@ const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password'];
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Tenta obter o token dos cookies primeiro, depois do header
-  const token = 
-    request.cookies.get('auth-token')?.value ||
-    request.headers.get('authorization')?.replace('Bearer ', '');
+  // Obtém o token dos cookies
+  const token = request.cookies.get('auth-token')?.value;
 
   // Se a rota é protegida e não tem token, redireciona para login
   const isProtectedRoute = PROTECTED_ROUTES.some((route) =>

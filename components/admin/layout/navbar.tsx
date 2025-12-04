@@ -2,13 +2,13 @@
 
 import { LogOut, User, Bell, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { signOut } from '@/lib/auth';
+import { logoutAction } from '@/actions/auth-actions';
 
 export function Navbar() {
   const router = useRouter();
 
-  const handleLogout = () => {
-    signOut();
+  const handleLogout = async () => {
+    await logoutAction();
     router.push('/login');
     router.refresh();
   };

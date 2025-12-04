@@ -2,32 +2,54 @@
 
 import { useEffect, useState } from 'react';
 import { Header } from '@/components/admin/layout/header';
-import { leagueService } from '@/lib/api';
+import { getAllLeaguesAction } from '@/actions/league-actions';
+import { getCurrentUserIdAction } from '@/actions/auth-actions';
+import { CreateLeagueModal } from '@/components/leagues/create-league-modal';
 import type { LeagueResponse } from '@/types';
 import { Trophy, Plus, Loader2, Eye } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LigasPage() {
   const [leagues, setLeagues] = useState<LeagueResponse[]>([]);
+  const [userId, setUserId] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadLeagues();
+    loadData();
   }, []);
 
-  const loadLeagues = async () => {
+  const loadData = async () => {
     try {
       setIsLoading(true);
-      const data = await leagueService.getAll();
-      setLeagues(data);
+      const [leaguesResult, userIdResult] = await Promise.all([
+        getAllLeaguesAction(),
+        getCurrentUserIdAction(),
+      ]);
+      console.log("🚀 ~ loadData ~ leaguesResult:", leaguesResult)
+
+      if (leaguesResult.success) {
+        setLeagues(leaguesResult.data);
+      } else {
+        setError(leaguesResult.error || 'Erro ao carregar ligas');
+      }
+
+      if (userIdResult.success && userIdResult.data) {
+        setUserId(userIdResult.data);
+      }
+
       setError(null);
     } catch (err) {
-      setError('Erro ao carregar ligas');
+      setError('Erro ao carregar dados');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleLeagueCreated = () => {
+    loadData();
   };
 
   return (
@@ -36,15 +58,26 @@ export default function LigasPage() {
         title="Ligas"
         description="Gerencie todas as ligas de basquete"
         action={
-          <Link
-            href="/ligas/nova"
-            className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            <Plus className="h-4 w-4" />
-            Nova Liga
-          </Link>
+          !isLoading && leagues.length > 0 ? (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              <Plus className="h-4 w-4" />
+              Nova Liga
+            </button>
+          ) : null
         }
       />
+
+      {userId && (
+        <CreateLeagueModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={handleLeagueCreated}
+          userId={userId}
+        />
+      )}
 
       {error && (
         <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
@@ -62,13 +95,6 @@ export default function LigasPage() {
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
             Nenhuma liga cadastrada ainda.
           </p>
-          <Link
-            href="/ligas/nova"
-            className="mt-4 inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4" />
-            Criar primeira liga
-          </Link>
         </div>
       ) : (
         <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
