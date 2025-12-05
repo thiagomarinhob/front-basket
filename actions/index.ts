@@ -43,6 +43,7 @@ export { createCategoryAction } from './category-actions';
 // Games
 export {
   createGameAction,
+  getAllGamesAction,
   getGamesByLeagueAction,
   getGameStatsAction,
   recordGameStatsAction,

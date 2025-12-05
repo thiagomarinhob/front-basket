@@ -153,9 +153,19 @@ export function CreateGameModal({
         newData.awayTeamId = '';
       }
       
+      // Se o time mandante mudou e é o mesmo do visitante, limpa o visitante
+      if (name === 'homeTeamId' && value === prev.awayTeamId) {
+        newData.awayTeamId = '';
+      }
+      
       return newData;
     });
   };
+
+  // Filtra os times disponíveis para o time visitante (exclui o time mandante selecionado)
+  const availableAwayTeams = formData.homeTeamId
+    ? teams.filter((team) => team.id !== formData.homeTeamId)
+    : teams;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Novo Jogo" size="lg">
@@ -238,7 +248,7 @@ export function CreateGameModal({
               <option value="">
                 {isLoadingTeams ? 'Carregando...' : !formData.leagueId ? 'Selecione uma liga primeiro' : 'Selecione o time'}
               </option>
-              {teams.map((team) => (
+              {availableAwayTeams.map((team) => (
                 <option key={team.id} value={team.id}>
                   {team.name}
                 </option>

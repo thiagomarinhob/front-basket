@@ -66,18 +66,15 @@ export default async function TeamDetailsPage({
       </div>
 
       <div className="flex items-start gap-4">
-        {team.logoUrl && (
-          <div className="flex-shrink-0">
-            <Image
-              // src={team.logoUrl}
-              src="/images/team-placeholder.png"
-              alt={team.name}
-              width={80}
-              height={80}
-              className="rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
-            />
-          </div>
-        )}
+        <div className="shrink-0">
+          <Image
+            src="/images/team-placeholder.svg"
+            alt={team.name}
+            width={80}
+            height={80}
+            className="rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+          />
+        </div>
         <div className="flex-1">
           <Header
             title={team.name}

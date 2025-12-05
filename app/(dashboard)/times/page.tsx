@@ -148,16 +148,13 @@ export default function TimesPage() {
                   >
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex items-center">
-                        {team.logoUrl && (
-                          <Image
-                            // src={team.logoUrl}
-                            src="/images/team-placeholder.png"
-                            alt={team.name}
-                            width={40}
-                            height={40}
-                            className="mr-3 rounded-full object-cover"
-                          />
-                        )}
+                        <Image
+                          src="/images/team-placeholder.svg"
+                          alt={team.name}
+                          width={40}
+                          height={40}
+                          className="mr-3 rounded-full object-cover"
+                        />
                         <div>
                           <span className="font-medium text-gray-900 dark:text-white">
                             {team.name}

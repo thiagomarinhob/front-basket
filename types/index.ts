@@ -380,3 +380,15 @@ export interface PageTeamResponse {
   numberOfElements: number;
   empty: boolean;
 }
+
+export interface PageGameResponse {
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  content: GameResponse[];
+  number: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+  empty: boolean;
+}

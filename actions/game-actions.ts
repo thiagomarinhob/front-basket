@@ -9,6 +9,8 @@ import type {
   PlayerStatsResponse,
   GameEventRequest,
   GameEvent,
+  PageGameResponse,
+  GameStatus,
 } from '@/types';
 
 /**
@@ -30,6 +32,65 @@ export async function createGameAction(data: GameRequest) {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro ao criar jogo',
+    };
+  }
+}
+
+/**
+ * Lista todos os jogos com filtros e paginação
+ */
+export async function getAllGamesAction(
+  page: number = 0,
+  size: number = 10,
+  filters?: {
+    leagueId?: string;
+    status?: GameStatus;
+    startDate?: string;
+    endDate?: string;
+  }
+) {
+  try {
+    const params: Record<string, string | number> = {
+      page,
+      size,
+    };
+
+    if (filters?.leagueId) {
+      params.leagueId = filters.leagueId;
+    }
+    if (filters?.status) {
+      params.status = filters.status;
+    }
+    if (filters?.startDate) {
+      // Converte de datetime-local (YYYY-MM-DDTHH:mm) para ISO_DATE_TIME (YYYY-MM-DDTHH:mm:ss)
+      const startDate = filters.startDate.includes('T')
+        ? `${filters.startDate}:00`
+        : filters.startDate;
+      params.startDate = startDate;
+    }
+    if (filters?.endDate) {
+      // Converte de datetime-local (YYYY-MM-DDTHH:mm) para ISO_DATE_TIME (YYYY-MM-DDTHH:mm:ss)
+      const endDate = filters.endDate.includes('T')
+        ? `${filters.endDate}:00`
+        : filters.endDate;
+      params.endDate = endDate;
+    }
+
+    const games = await apiRequest<PageGameResponse>('/games', {
+      method: 'GET',
+      params,
+      requireAuth: true,
+    });
+
+    return {
+      success: true,
+      data: games,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Erro ao buscar jogos',
+      data: null,
     };
   }
 }
