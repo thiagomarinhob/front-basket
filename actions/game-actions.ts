@@ -190,6 +190,40 @@ export async function getPlayerStatsInGameAction(gameId: string, playerId: strin
 }
 
 /**
+ * Busca um jogo pelo ID através da lista de jogos
+ * Como não há endpoint direto, busca através da lista paginada
+ */
+export async function getGameByIdAction(gameId: string) {
+  try {
+    // Busca o jogo na primeira página (assumindo que o jogo existe)
+    const gamesResult = await getAllGamesAction(0, 1000);
+    
+    if (gamesResult.success && gamesResult.data) {
+      const game = gamesResult.data.content.find((g) => g.id === gameId);
+      
+      if (game) {
+        return {
+          success: true,
+          data: game,
+        };
+      }
+    }
+
+    return {
+      success: false,
+      error: 'Jogo não encontrado',
+      data: null,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Erro ao buscar jogo',
+      data: null,
+    };
+  }
+}
+
+/**
  * Cria um evento de jogo
  */
 export async function createGameEventAction(data: GameEventRequest) {

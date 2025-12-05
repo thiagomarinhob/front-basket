@@ -38,7 +38,7 @@ export {
 } from './player-actions';
 
 // Categories
-export { createCategoryAction } from './category-actions';
+export { createCategoryAction, getAllCategoriesAction } from './category-actions';
 
 // Games
 export {
