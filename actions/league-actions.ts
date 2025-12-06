@@ -214,3 +214,30 @@ export async function addTeamToLeagueAction(leagueId: string, teamId: string) {
   }
 }
 
+/**
+ * Remove um time de uma liga
+ */
+export async function removeTeamFromLeagueAction(leagueId: string, teamId: string) {
+  try {
+    // DELETE pode retornar 200 ou 204 sem corpo
+    const result = await apiRequest<unknown>(
+      `/leagues/${leagueId}/teams/${teamId}`,
+      {
+        method: 'DELETE',
+        requireAuth: true,
+      }
+    );
+
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Erro ao remover time da liga';
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+

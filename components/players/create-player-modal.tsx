@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Modal } from '@/components/ui/modal';
-import { createPlayerAction } from '@/actions/player-actions';
-import type { Player } from '@/types';
+import { createPlayerAction, getPlayerPositionsAction } from '@/actions/player-actions';
+import type { Player, PlayerPosition } from '@/types';
 import { Loader2 } from 'lucide-react';
 
 interface CreatePlayerModalProps {
@@ -26,9 +26,12 @@ export function CreatePlayerModal({
     height: undefined,
     jerseyNumber: undefined,
     photoURL: '',
+    position: undefined,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [positions, setPositions] = useState<PlayerPosition[]>([]);
+  const [isLoadingPositions, setIsLoadingPositions] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -41,10 +44,26 @@ export function CreatePlayerModal({
         height: undefined,
         jerseyNumber: undefined,
         photoURL: '',
+        position: undefined,
       });
       setError(null);
+      loadPositions();
     }
   }, [isOpen]);
+
+  const loadPositions = async () => {
+    setIsLoadingPositions(true);
+    try {
+      const result = await getPlayerPositionsAction();
+      if (result.success && result.data) {
+        setPositions(result.data);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar posições:', err);
+    } finally {
+      setIsLoadingPositions(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +83,7 @@ export function CreatePlayerModal({
         birthDate: formData.birthDate || undefined,
         height: formData.height ? parseFloat(String(formData.height)) : undefined,
         jerseyNumber: formData.jerseyNumber ? parseInt(String(formData.jerseyNumber), 10) : undefined,
+        position: formData.position || undefined,
       } as Player;
 
       const result = await createPlayerAction(playerData);
@@ -84,8 +104,19 @@ export function CreatePlayerModal({
     }
   };
 
+  const getPositionLabel = (position: PlayerPosition): string => {
+    const labels: Record<PlayerPosition, string> = {
+      ARMADOR: 'Armador',
+      ALA_ARMADOR: 'Ala/Armador',
+      ALA: 'Ala',
+      ALA_PIVO: 'Ala/Pivô',
+      PIVO: 'Pivô',
+    };
+    return labels[position] || position;
+  };
+
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -95,6 +126,8 @@ export function CreatePlayerModal({
           ? value ? parseFloat(value) : undefined
           : name === 'jerseyNumber'
           ? value ? parseInt(value, 10) : undefined
+          : name === 'position'
+          ? value || undefined
           : value,
     }));
   };
@@ -251,6 +284,33 @@ export function CreatePlayerModal({
               disabled={isSubmitting}
             />
           </div>
+        </div>
+
+        <div>
+          <label
+            htmlFor="position"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Posição
+          </label>
+          <select
+            id="position"
+            name="position"
+            value={formData.position || ''}
+            onChange={handleChange}
+            className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            disabled={isSubmitting || isLoadingPositions}
+          >
+            <option value="">
+              {isLoadingPositions ? 'Carregando posições...' : 'Selecione uma posição'}
+            </option>
+            {!isLoadingPositions &&
+              positions.map((position) => (
+                <option key={position} value={position}>
+                  {getPositionLabel(position)}
+                </option>
+              ))}
+          </select>
         </div>
 
         <div>

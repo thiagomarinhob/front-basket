@@ -63,12 +63,22 @@ export async function apiRequest<T>(
     throw new Error(`API Error (${response.status}): ${errorText}`);
   }
 
-  // Alguns endpoints podem retornar 204 (No Content)
-  if (response.status === 204) {
+  // Alguns endpoints podem retornar 204 (No Content) ou 200 sem corpo
+  if (response.status === 204 || response.headers.get('content-length') === '0') {
     return {} as T;
   }
 
-  return response.json();
+  // Verifica se há conteúdo antes de tentar fazer parse
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    const text = await response.text();
+    if (text.trim() === '') {
+      return {} as T;
+    }
+    return JSON.parse(text);
+  }
+
+  return {} as T;
 }
 
 // Helpers específicos
@@ -149,6 +159,9 @@ export const leagueService = {
       `/leagues/${leagueId}/teams`
     );
   },
+  removeTeam: async (leagueId: string, teamId: string) => {
+    return api.delete(`/leagues/${leagueId}/teams/${teamId}`);
+  },
 };
 
 export const teamService = {
@@ -189,6 +202,11 @@ export const teamService = {
   addToLeague: async (leagueId: string, teamId: string) => {
     return api.post<unknown>(`/leagues/${leagueId}/teams/${teamId}`);
   },
+  getByCategory: async (categoryId: string) => {
+    return api.get<import('@/types').TeamResponse[]>(
+      `/teams/category/${categoryId}`
+    );
+  },
 };
 
 export const playerService = {
@@ -228,4 +246,5 @@ export const gameService = {
   createEvent: async (data: import('@/types').GameEventRequest) => {
     return api.post<import('@/types').GameEvent>('/games/events', data);
   },
+};
 };

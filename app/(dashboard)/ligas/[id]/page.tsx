@@ -14,8 +14,8 @@ import {
   Users,
   TrendingUp,
   Target,
-  Loader2,
   ArrowLeft,
+  Tag,
 } from 'lucide-react';
 import Link from 'next/link';
 import type {
@@ -26,6 +26,8 @@ import type {
   TopScorerResponse,
   ThreePointLeaderResponse,
 } from '@/types';
+import { AddTeamButton } from '@/components/leagues/add-team-button';
+import { RemoveTeamButton } from '@/components/leagues/remove-team-button';
 
 interface LeagueDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -158,6 +160,29 @@ export default async function LeagueDetailsPage({
             </div>
           </div>
         </div>
+
+        {league.category && (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-orange-100 p-3 dark:bg-orange-900/30">
+                <Tag className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Categoria
+                </p>
+                <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {league.category.name}
+                </p>
+                {league.category.categoryGender && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {league.category.categoryGender === 'MALE' ? 'Masculino' : 'Feminino'}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -243,9 +268,16 @@ export default async function LeagueDetailsPage({
         {/* Times Participantes */}
         <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Times Participantes
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Times Participantes
+              </h2>
+              <AddTeamButton
+                leagueId={id}
+                currentTeamIds={teams.map((team) => team.id)}
+                categoryId={league.category?.id}
+              />
+            </div>
           </div>
           <div className="p-6">
             {teams.length === 0 ? (
@@ -257,25 +289,32 @@ export default async function LeagueDetailsPage({
                 {teams.map((team) => (
                   <div
                     key={team.id}
-                    className="flex items-center gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
+                    className="flex items-center justify-between gap-3 rounded-md border border-gray-200 p-3 dark:border-gray-700"
                   >
-                    {team.logoUrl && (
-                      <img
-                        src={team.logoUrl}
-                        alt={team.name}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {team.name}
-                      </p>
-                      {team.location && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {team.location}
-                        </p>
+                    <div className="flex items-center gap-3 flex-1">
+                      {team.logoUrl && (
+                        <img
+                          src={team.logoUrl}
+                          alt={team.name}
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
                       )}
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {team.name}
+                        </p>
+                        {team.location && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {team.location}
+                          </p>
+                        )}
+                      </div>
                     </div>
+                    <RemoveTeamButton
+                      leagueId={id}
+                      teamId={team.id}
+                      teamName={team.name}
+                    />
                   </div>
                 ))}
               </div>

@@ -1,7 +1,7 @@
 'use server';
 
 import { apiRequest } from './_helpers';
-import type { Player, PlayerResponse, PagePlayerResponse } from '@/types';
+import type { Player, PlayerResponse, PagePlayerResponse, PlayerPosition } from '@/types';
 
 /**
  * Cria um novo jogador
@@ -68,6 +68,29 @@ export async function getPlayerByIdAction(id: string) {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Erro ao buscar jogador',
+      data: null,
+    };
+  }
+}
+
+/**
+ * Busca todas as posições disponíveis
+ */
+export async function getPlayerPositionsAction() {
+  try {
+    const positions = await apiRequest<PlayerPosition[]>('/players/positions', {
+      method: 'GET',
+      requireAuth: true,
+    });
+
+    return {
+      success: true,
+      data: positions,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Erro ao buscar posições',
       data: null,
     };
   }

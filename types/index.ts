@@ -104,6 +104,8 @@ export interface ListTeamResponse {
 }
 
 // ===== JOGADORES =====
+export type PlayerPosition = 'ARMADOR' | 'ALA_ARMADOR' | 'ALA' | 'ALA_PIVO' | 'PIVO';
+
 export interface Player {
   id: string;
   firstName: string;
@@ -114,6 +116,7 @@ export interface Player {
   height?: number;
   jerseyNumber?: number;
   photoURL?: string;
+  position?: PlayerPosition;
   createdAt: string;
   updatedAt: string;
 }
@@ -128,6 +131,7 @@ export interface PlayerResponse {
   height?: number;
   jerseyNumber?: number;
   photoURL?: string;
+  position?: PlayerPosition;
 }
 
 export interface ListPlayersResponse {
@@ -189,6 +193,7 @@ export interface LeagueResponse {
   logoUrl?: string;
   startDate: string;
   endDate?: string;
+  category?: CategoryResponse;
 }
 
 // ===== JOGOS =====

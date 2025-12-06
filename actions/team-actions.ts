@@ -212,3 +212,29 @@ export async function addCategoryToTeamAction(teamId: string, categoryId: string
   }
 }
 
+/**
+ * Lista os times por categoria
+ */
+export async function getTeamsByCategoryAction(categoryId: string) {
+  try {
+    const teams = await apiRequest<TeamResponse[]>(
+      `/teams/category/${categoryId}`,
+      {
+        method: 'GET',
+        requireAuth: true,
+      }
+    );
+
+    return {
+      success: true,
+      data: teams,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Erro ao buscar times por categoria',
+      data: [],
+    };
+  }
+}
+

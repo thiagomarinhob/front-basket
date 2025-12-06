@@ -58,7 +58,7 @@ export default function LigasPage() {
         title="Ligas"
         description="Gerencie todas as ligas de basquete"
         action={
-          !isLoading && leagues.length > 0 ? (
+          !isLoading && userId ? (
             <button
               onClick={() => setIsModalOpen(true)}
               className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -94,6 +94,9 @@ export default function LigasPage() {
           <Trophy className="mx-auto h-12 w-12 text-gray-400" />
           <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
             Nenhuma liga cadastrada ainda.
+          </p>
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            Use o botão acima para criar uma nova liga
           </p>
         </div>
       ) : (

@@ -20,6 +20,7 @@ import type {
   ListPlayersResponse,
   ListCategoryResponse,
 } from '@/types';
+import { AddCategoryButton } from '@/components/teams/add-category-button';
 
 interface TeamDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -156,11 +157,21 @@ export default async function TeamDetailsPage({
         {/* Categorias do Time */}
         <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-            <div className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Categorias
-              </h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Categorias
+                </h2>
+              </div>
+              <AddCategoryButton
+                teamId={id}
+                currentCategoryIds={
+                  team.categories
+                    ? team.categories.map((cat) => cat.id)
+                    : categories.map((cat) => cat.id)
+                }
+              />
             </div>
           </div>
           <div className="p-6">
@@ -183,7 +194,7 @@ export default async function TeamDetailsPage({
                         )}
                       </div>
                       <span className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
-                        {category.categoryGender}
+                        {category.categoryGender === 'MALE' ? 'Masculino' : category.categoryGender === 'FEMALE' ? 'Feminino' : category.categoryGender}
                       </span>
                     </div>
                   </div>
@@ -201,7 +212,7 @@ export default async function TeamDetailsPage({
                         {category.name}
                       </p>
                       <span className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
-                        {category.categoryGender}
+                        {category.categoryGender === 'MALE' ? 'Masculino' : category.categoryGender === 'FEMALE' ? 'Feminino' : category.categoryGender}
                       </span>
                     </div>
                   </div>
